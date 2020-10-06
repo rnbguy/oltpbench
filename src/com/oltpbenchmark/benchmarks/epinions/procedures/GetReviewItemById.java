@@ -26,15 +26,23 @@ import com.oltpbenchmark.api.SQLStmt;
 
 public class GetReviewItemById extends Procedure {
 
-    public final SQLStmt getReviewItem = new SQLStmt(
-        "SELECT * FROM review r, item i WHERE i.i_id = r.i_id and r.i_id=? " +
-        "ORDER BY rating LIMIT 10;"
+    // public final SQLStmt getReviewItem = new SQLStmt(
+    //     "SELECT * FROM review r, item i WHERE i.i_id = r.i_id and r.i_id=?;"
+    // );
+
+    public final SQLStmt getReviewItem1 = new SQLStmt(
+        "SELECT * FROM review WHERE i_id=?;"
+    );
+
+    public final SQLStmt getReviewItem2 = new SQLStmt(
+        "SELECT * FROM item WHERE i_id=?;"
     );
     
     public void run(Connection conn, long iid) throws SQLException {
-        PreparedStatement stmt = this.getPreparedStatement(conn, getReviewItem);
-        stmt.setLong(1, iid);
-        ResultSet r= stmt.executeQuery();
+        PreparedStatement stmt1 = this.getPreparedStatement(conn, getReviewItem1);
+        PreparedStatement stmt2 = this.getPreparedStatement(conn, getReviewItem2);
+        stmt2.setLong(1, iid);
+        ResultSet r= stmt2.executeQuery();
         while (r.next()) {
             continue;
         }

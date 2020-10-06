@@ -11,14 +11,14 @@
     <uploadCode></uploadCode>
     <uploadUrl></uploadUrl>
     
-    <scalefactor>1</scalefactor>
+    <scalefactor>0.01</scalefactor>
     
     <!-- The workload -->
     <terminals>1</terminals>
     <works>
         <work>
-          <time>20</time>
-          <rate>100</rate>
+          <time>1</time>
+          <rate>1</rate>
           <weights>15,15,15,25,15,15</weights>
         </work>
     </works>

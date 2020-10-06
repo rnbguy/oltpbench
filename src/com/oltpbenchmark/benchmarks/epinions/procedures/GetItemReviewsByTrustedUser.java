@@ -28,11 +28,11 @@ public class GetItemReviewsByTrustedUser extends Procedure {
 
 	//FIXME: CARLO, does this make sense?
     public final SQLStmt getReview = new SQLStmt(
-        "SELECT * FROM review r WHERE r.i_id=?"
+        "SELECT * FROM review WHERE i_id=?"
     );
     
     public final SQLStmt getTrust = new SQLStmt(
-        "SELECT * FROM trust t WHERE t.source_u_id=?"
+        "SELECT * FROM trust WHERE source_u_id=?"
     );
     
     public void run(Connection conn, long iid, long uid) throws SQLException {

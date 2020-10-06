@@ -25,8 +25,8 @@ import java.util.Random;
  */
 public abstract class TextGenerator {
     
-    private static final int CHAR_START = 32; // [space]
-    private static final int CHAR_STOP  = 126; // [~]
+    private static final int CHAR_START = 48; // [space]
+    private static final int CHAR_STOP  = 91; // [~]
     private static final char[] CHAR_SYMBOLS = new char[1 + CHAR_STOP - CHAR_START];
     static {
         for (int i = 0; i < CHAR_SYMBOLS.length; i++) {

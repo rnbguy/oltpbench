@@ -35,7 +35,7 @@ public class GetPageAuthenticated extends Procedure {
     
     public SQLStmt selectPage = new SQLStmt(
         "SELECT * FROM " + WikipediaConstants.TABLENAME_PAGE + 
-        " WHERE page_namespace = ? AND page_title = ? LIMIT 1"
+        " WHERE page_namespace = ? AND page_title = ?"
     );
     public SQLStmt selectPageRestriction = new SQLStmt(
         "SELECT * FROM " + WikipediaConstants.TABLENAME_PAGE_RESTRICTIONS + 
@@ -52,15 +52,15 @@ public class GetPageAuthenticated extends Procedure {
         " WHERE page_id = rev_page " +
         "   AND rev_page = ? " +
         "   AND page_id = ? " +
-        "   AND rev_id = page_latest LIMIT 1"
+        "   AND rev_id = page_latest"
     );
     public SQLStmt selectText = new SQLStmt(
         "SELECT old_text,old_flags FROM " + WikipediaConstants.TABLENAME_TEXT +
-        " WHERE old_id = ? LIMIT 1"
+        " WHERE old_id = ?"
     );
 	public SQLStmt selectUser = new SQLStmt(
         "SELECT * FROM " + WikipediaConstants.TABLENAME_USER + 
-        " WHERE user_id = ? LIMIT 1"
+        " WHERE user_id = ?"
     );
 	public SQLStmt selectGroup = new SQLStmt(
         "SELECT ug_group FROM " + WikipediaConstants.TABLENAME_USER_GROUPS + 

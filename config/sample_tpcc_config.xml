@@ -12,18 +12,18 @@
     <uploadUrl></uploadUrl>
     
     <!-- Scale factor is the number of warehouses in TPCC -->
-    <scalefactor>2</scalefactor>
+    <scalefactor>.0000000000000001</scalefactor>
     
     <!-- The workload -->
     <terminals>2</terminals>
     <works>
         <work>
-          <time>60</time>
-          <rate>10000</rate>
+          <time>1</time>
+          <rate>1</rate>
           <weights>45,43,4,4,4</weights>
         </work>
     </works>
-	
+
 	<!-- TPCC specific -->  
    	<transactiontypes>
     	<transactiontype>

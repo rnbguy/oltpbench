@@ -35,24 +35,26 @@ public class MySQLCollector extends DBCollector {
 
     @Override
     public String collectParameters() {
-        Map<String, String> parameters = null;
-        try {
-            parameters = getKeyValueResults(PARAMETERS_SQL);
-        } catch (SQLException ex) {
-            LOG.warn("Error collecting DB parameters: " + ex.getMessage());
-        }
-        return toJSONString(parameters);
+        // Map<String, String> parameters = null;
+        // try {
+        //     parameters = getKeyValueResults(PARAMETERS_SQL);
+        // } catch (SQLException ex) {
+        //     LOG.warn("Error collecting DB parameters: " + ex.getMessage());
+        // }
+        // return toJSONString(parameters);
+        return "{}";
     }
 
     @Override
     public String collectMetrics() {
-        Map<String, String> metrics = null;
-        try {
-            metrics = getKeyValueResults(METRICS_SQL);
-        } catch (SQLException ex) {
-            LOG.warn("Error collecting DB metrics: " + ex.getMessage());
-        }
-        return toJSONString(metrics);
+        // Map<String, String> metrics = null;
+        // try {
+        //     metrics = getKeyValueResults(METRICS_SQL);
+        // } catch (SQLException ex) {
+        //     LOG.warn("Error collecting DB metrics: " + ex.getMessage());
+        // }
+        // return toJSONString(metrics);
+        return "{}";
     }
 
 }

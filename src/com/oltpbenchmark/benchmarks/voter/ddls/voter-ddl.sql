@@ -31,33 +31,3 @@ CREATE TABLE VOTES
 , contestant_number  integer    NOT NULL REFERENCES CONTESTANTS (contestant_number)
 , created            timestamp  NOT NULL
 );
-CREATE INDEX idx_votes_phone_number ON VOTES (phone_number);
-
--- rollup of votes by phone number, used to reject excessive voting
-CREATE VIEW V_VOTES_BY_PHONE_NUMBER
-(
-  phone_number
-, num_votes
-)
-AS
-   SELECT phone_number
-        , COUNT(*)
-     FROM VOTES
- GROUP BY phone_number
-;
-
--- rollup of votes by contestant and state for the heat map and results
-CREATE VIEW V_VOTES_BY_CONTESTANT_NUMBER_STATE
-(
-  contestant_number
-, state
-, num_votes
-)
-AS
-   SELECT contestant_number
-        , state
-        , COUNT(*)
-     FROM VOTES
- GROUP BY contestant_number
-        , state
-;

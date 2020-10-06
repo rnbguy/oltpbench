@@ -39,8 +39,8 @@ public class Delivery extends TPCCProcedure {
 	        "SELECT NO_O_ID FROM " + TPCCConstants.TABLENAME_NEWORDER + 
 	        " WHERE NO_D_ID = ? " +
 	        "   AND NO_W_ID = ? " +
-	        " ORDER BY NO_O_ID ASC " +
-	        " LIMIT 1");
+	        " ORDER BY NO_O_ID ASC ");
+	        // " LIMIT 1");
 	
 	public SQLStmt delivDeleteNewOrderSQL = new SQLStmt(
 	        "DELETE FROM " + TPCCConstants.TABLENAME_NEWORDER +
@@ -69,7 +69,8 @@ public class Delivery extends TPCCProcedure {
 			"   AND OL_W_ID = ? ");
 	
 	public SQLStmt delivSumOrderAmountSQL = new SQLStmt(
-	        "SELECT SUM(OL_AMOUNT) AS OL_TOTAL " +
+	//         "SELECT SUM(OL_AMOUNT) AS OL_TOTAL " +
+	        "SELECT OL_AMOUNT " +
 			"  FROM " + TPCCConstants.TABLENAME_ORDERLINE + 
 			" WHERE OL_O_ID = ? " +
 			"   AND OL_D_ID = ? " +
@@ -206,13 +207,17 @@ public class Delivery extends TPCCProcedure {
             rs = delivSumOrderAmount.executeQuery();
             if (trace) LOG.trace("delivSumOrderAmount END");
 
-            if (!rs.next()) {
+            while (rs.next()) {
+                ol_total += rs.getFloat(1);
+            }
+
+            if (ol_total == 0) {
                 String msg = String.format("Failed to retrieve ORDER_LINE records [W_ID=%d, D_ID=%d, O_ID=%d]",
                                            w_id, d_id, no_o_id);
                 if (trace) LOG.warn(msg);
                 throw new RuntimeException(msg);
             }
-            ol_total = rs.getFloat("OL_TOTAL");
+            // ol_total = rs.getFloat("OL_TOTAL");
             rs.close();
 
             int idx = 1; // HACK: So that we can debug this query

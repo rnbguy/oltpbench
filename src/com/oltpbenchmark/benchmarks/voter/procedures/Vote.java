@@ -53,6 +53,9 @@ import java.sql.SQLException;
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.SQLStmt;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Vote extends Procedure {
 	
     // potential return codes
@@ -67,7 +70,7 @@ public class Vote extends Procedure {
 	
     // Checks if the voter has exceeded their allowed number of votes
     public final SQLStmt checkVoterStmt = new SQLStmt(
-		"SELECT COUNT(*) FROM VOTES WHERE phone_number = ?;"
+		"SELECT * FROM VOTES WHERE phone_number = ?;"
     );
 	
     // Checks an area code to retrieve the corresponding state
@@ -78,7 +81,7 @@ public class Vote extends Procedure {
     // Records a vote
     public final SQLStmt insertVoteStmt = new SQLStmt(
 		"INSERT INTO VOTES (vote_id, phone_number, state, contestant_number, created) " +
-    "VALUES (?, ?, ?, ?, NOW());"
+    "VALUES (?, ?, ?, ?, ?);"
     );
 	
     public long run(Connection conn, long voteId, long phoneNumber, int contestantNumber, long maxVotesPerPhoneNumber) throws SQLException {
@@ -98,8 +101,12 @@ public class Vote extends Procedure {
         ps.setLong(1, phoneNumber);
         rs = ps.executeQuery();
         boolean hasVoterEnt = rs.next();
+        Long voterCount = new Long(0);
+        while (rs.next()) {
+            voterCount += 1;
+        }
         try {
-            if (hasVoterEnt && rs.getLong(1) >= maxVotesPerPhoneNumber) {
+            if (hasVoterEnt && voterCount >= maxVotesPerPhoneNumber) {
                 return ERR_VOTER_OVER_VOTE_LIMIT;
             }
         } finally {
@@ -122,6 +129,8 @@ public class Vote extends Procedure {
         ps.setLong(2, phoneNumber);
         ps.setString(3, state);
         ps.setInt(4, contestantNumber);
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        ps.setString(5, sdfDate.format(new Date()));
         ps.execute();
 		
         // Set the return value to 0: successful vote

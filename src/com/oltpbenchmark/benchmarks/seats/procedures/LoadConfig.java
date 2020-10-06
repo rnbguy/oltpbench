@@ -53,7 +53,7 @@ public class LoadConfig extends Procedure {
     );
     
     public final SQLStmt getFlights = new SQLStmt(
-        "SELECT f_id FROM " + SEATSConstants.TABLENAME_FLIGHT +
+        "SELECT F_ID FROM " + SEATSConstants.TABLENAME_FLIGHT +
         " ORDER BY F_DEPART_TIME DESC " + 
         " LIMIT " + SEATSConstants.CACHE_LIMIT_FLIGHT_IDS
     );

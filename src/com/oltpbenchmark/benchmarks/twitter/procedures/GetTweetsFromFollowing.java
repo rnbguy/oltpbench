@@ -30,7 +30,7 @@ public class GetTweetsFromFollowing extends Procedure {
 
     public final SQLStmt getFollowing = new SQLStmt(
         "SELECT f2 FROM " + TwitterConstants.TABLENAME_FOLLOWS +
-        " WHERE f1 = ? LIMIT " + TwitterConstants.LIMIT_FOLLOWERS
+        " WHERE f1 = ?"
     );
     
     /** NOTE: The ?? is substituted into a string of repeated ?'s */

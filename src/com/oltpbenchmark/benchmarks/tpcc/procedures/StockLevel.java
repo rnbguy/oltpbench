@@ -22,6 +22,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import com.oltpbenchmark.api.SQLStmt;
@@ -39,20 +42,37 @@ public class StockLevel extends TPCCProcedure {
 	        " WHERE D_W_ID = ? " +
             "   AND D_ID = ?");
 
-	public SQLStmt stockGetCountStockSQL = new SQLStmt(
-	        "SELECT COUNT(DISTINCT (S_I_ID)) AS STOCK_COUNT " +
-			" FROM " + TPCCConstants.TABLENAME_ORDERLINE + ", " + TPCCConstants.TABLENAME_STOCK +
-			" WHERE OL_W_ID = ?" +
-			" AND OL_D_ID = ?" +
-			" AND OL_O_ID < ?" +
-			" AND OL_O_ID >= ?" +
-			" AND S_W_ID = ?" +
-			" AND S_I_ID = OL_I_ID" + 
-			" AND S_QUANTITY < ?");
+	// public SQLStmt stockGetCountStockSQL = new SQLStmt(
+	//         "SELECT COUNT(DISTINCT (S_I_ID)) AS STOCK_COUNT " +
+	// 		" FROM " + TPCCConstants.TABLENAME_ORDERLINE + ", " + TPCCConstants.TABLENAME_STOCK +
+	// 		" WHERE OL_W_ID = ?" +
+	// 		" AND OL_D_ID = ?" +
+	// 		" AND OL_O_ID < ?" +
+	// 		" AND OL_O_ID >= ?" +
+	// 		" AND S_W_ID = ?" +
+	// 		" AND S_I_ID = OL_I_ID" + 
+    //         " AND S_QUANTITY < ?");
+    
+    public SQLStmt getOrderLineIdSQL = new SQLStmt(
+            "SELECT OL_I_ID " +
+            " FROM " + TPCCConstants.TABLENAME_ORDERLINE +
+            " WHERE OL_W_ID=? " +
+            " AND OL_D_ID=? " + 
+            " AND OL_O_ID < ? " + 
+            " AND OL_O_ID > ?");
+
+    public SQLStmt getCountStockSQL = new SQLStmt(
+            "SELECT S_I_ID " + 
+            " FROM " + TPCCConstants.TABLENAME_STOCK + 
+            " WHERE S_W_ID=? " +
+            " AND S_I_ID = ?" +
+            " AND S_QUANTITY < ? ");
 
 	// Stock Level Txn
 	private PreparedStatement stockGetDistOrderId = null;
-	private PreparedStatement stockGetCountStock = null;
+	// private PreparedStatement stockGetCountStock = null;
+	private PreparedStatement getOrderLineId = null;
+	private PreparedStatement getCountStock = null;
 
 	 public ResultSet run(Connection conn, Random gen,
 				int w_id, int numWarehouses,
@@ -62,7 +82,9 @@ public class StockLevel extends TPCCProcedure {
 	     boolean trace = LOG.isTraceEnabled(); 
 	     
 	     stockGetDistOrderId = this.getPreparedStatement(conn, stockGetDistOrderIdSQL);
-	     stockGetCountStock= this.getPreparedStatement(conn, stockGetCountStockSQL);
+         // stockGetCountStock= this.getPreparedStatement(conn, stockGetCountStockSQL);
+         getOrderLineId = this.getPreparedStatement(conn, getOrderLineIdSQL);
+         getCountStock = this.getPreparedStatement(conn, getCountStockSQL);
 
 	     int threshold = TPCCUtil.randomNumber(10, 20, gen);
 	     int d_id = TPCCUtil.randomNumber(terminalDistrictLowerID,terminalDistrictUpperID, gen);
@@ -83,23 +105,50 @@ public class StockLevel extends TPCCProcedure {
          o_id = rs.getInt("D_NEXT_O_ID");
          rs.close();
 
-         stockGetCountStock.setInt(1, w_id);
-         stockGetCountStock.setInt(2, d_id);
-         stockGetCountStock.setInt(3, o_id);
-         stockGetCountStock.setInt(4, o_id - 20);
-         stockGetCountStock.setInt(5, w_id);
-         stockGetCountStock.setInt(6, threshold);
+
+         // oltp code
+         // stockGetCountStock.setInt(1, w_id);
+         // stockGetCountStock.setInt(2, d_id);
+         // stockGetCountStock.setInt(3, o_id);
+         // stockGetCountStock.setInt(4, o_id - 20);
+         // stockGetCountStock.setInt(5, w_id);
+         // stockGetCountStock.setInt(6, threshold);
+         // if (trace) LOG.trace(String.format("stockGetCountStock BEGIN [W_ID=%d, D_ID=%d, O_ID=%d]", w_id, d_id, o_id));
+         // rs = stockGetCountStock.executeQuery();
+         // if (trace) LOG.trace("stockGetCountStock END");
+
+         // if (!rs.next()) {
+         //     String msg = String.format("Failed to get StockLevel result for COUNT query " +
+         //                                "[W_ID=%d, D_ID=%d, O_ID=%d]", w_id, d_id, o_id);
+         //     if (trace) LOG.warn(msg);
+         //    throw new RuntimeException(msg);
+         // }
+         // stock_count = rs.getInt("STOCK_COUNT");
+
+         getOrderLineId.setInt(1, w_id);
+         getOrderLineId.setInt(2, d_id);
+         getOrderLineId.setInt(3, o_id);
+         getOrderLineId.setInt(4, (o_id -20));
          if (trace) LOG.trace(String.format("stockGetCountStock BEGIN [W_ID=%d, D_ID=%d, O_ID=%d]", w_id, d_id, o_id));
-         rs = stockGetCountStock.executeQuery();
+         ResultSet ol_rs = getOrderLineId.executeQuery();
+         // ol_rs.next();
+         Set<Integer> stockIds = new HashSet<>();
+         while (ol_rs.next()) {
+             int ol_i_id = ol_rs.getInt("OL_I_ID");
+             getCountStock.setInt(1, w_id);
+             getCountStock.setInt(2, ol_i_id);
+             getCountStock.setInt(3, threshold);
+             ResultSet s_rs = getCountStock.executeQuery();
+             while (s_rs.next()) {
+                 stockIds.add(s_rs.getInt("S_I_ID"));
+             }
+             s_rs.close();
+         }
+         stock_count = stockIds.size();
          if (trace) LOG.trace("stockGetCountStock END");
 
-         if (!rs.next()) {
-             String msg = String.format("Failed to get StockLevel result for COUNT query " +
-                                        "[W_ID=%d, D_ID=%d, O_ID=%d]", w_id, d_id, o_id);
-             if (trace) LOG.warn(msg);
-             throw new RuntimeException(msg);
-         }
-         stock_count = rs.getInt("STOCK_COUNT");
+         ol_rs.close();
+
          if (trace) LOG.trace("stockGetCountStock RESULT=" + stock_count);
 
          conn.commit();

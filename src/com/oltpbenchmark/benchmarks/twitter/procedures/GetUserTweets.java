@@ -29,7 +29,7 @@ public class GetUserTweets extends Procedure {
 
     public final SQLStmt getTweets = new SQLStmt(
         "SELECT * FROM " + TwitterConstants.TABLENAME_TWEETS +
-        " WHERE uid = ? LIMIT " + TwitterConstants.LIMIT_TWEETS_FOR_UID
+        " WHERE uid = ?"
     );
     
     public void run(Connection conn, long uid) throws SQLException {

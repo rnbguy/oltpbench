@@ -1,24 +1,24 @@
 DROP TABLE IF EXISTS ipblocks;
 CREATE TABLE ipblocks (
-  ipb_id int NOT NULL auto_increment,
+  ipb_id int NOT NULL,
   ipb_address tinyblob NOT NULL,
   ipb_user int NOT NULL DEFAULT '0',
   ipb_by int NOT NULL DEFAULT '0',
   ipb_by_text varbinary(255) NOT NULL DEFAULT '',
   ipb_reason tinyblob NOT NULL,
-  ipb_timestamp binary(14) NOT NULL DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
-  ipb_auto tinyint(1) NOT NULL DEFAULT '0',
-  ipb_anon_only tinyint(1) NOT NULL DEFAULT '0',
-  ipb_create_account tinyint(1) NOT NULL DEFAULT '1',
-  ipb_enable_autoblock tinyint(1) NOT NULL DEFAULT '1',
-  ipb_expiry varbinary(14) NOT NULL DEFAULT '',
-  ipb_range_start tinyblob NOT NULL,
-  ipb_range_end tinyblob NOT NULL,
-  ipb_deleted tinyint(1) NOT NULL DEFAULT '0',
-  ipb_block_email tinyint(1) NOT NULL DEFAULT '0',
-  ipb_allow_usertalk tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (ipb_id),
-  UNIQUE (ipb_address(255),ipb_user,ipb_auto,ipb_anon_only)
+  -- ipb_timestamp binary(14) NOT NULL DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
+  -- ipb_auto tinyint(1) NOT NULL DEFAULT '0',
+  -- ipb_anon_only tinyint(1) NOT NULL DEFAULT '0',
+  -- ipb_create_account tinyint(1) NOT NULL DEFAULT '1',
+  -- ipb_enable_autoblock tinyint(1) NOT NULL DEFAULT '1',
+  -- ipb_expiry varbinary(14) NOT NULL DEFAULT '',
+  -- ipb_range_start tinyblob NOT NULL,
+  -- ipb_range_end tinyblob NOT NULL,
+  -- ipb_deleted tinyint(1) NOT NULL DEFAULT '0',
+  -- ipb_block_email tinyint(1) NOT NULL DEFAULT '0',
+  -- ipb_allow_usertalk tinyint(1) NOT NULL DEFAULT '0',
+  -- PRIMARY KEY (ipb_id),
+  -- UNIQUE (ipb_address(255),ipb_user,ipb_auto,ipb_anon_only)
 );
 
 CREATE INDEX IDX_IPB_USER ON ipblocks (ipb_user);
@@ -28,7 +28,7 @@ CREATE INDEX IDX_IPB_EXPIRY ON ipblocks (ipb_expiry);
 
 DROP TABLE IF EXISTS logging;
 CREATE TABLE logging (
-  log_id int NOT NULL auto_increment,
+  log_id int NOT NULL,
   log_type varbinary(32) NOT NULL,
   log_action varbinary(32) NOT NULL,
   log_timestamp binary(14) NOT NULL DEFAULT '19700101000000',
@@ -51,7 +51,7 @@ CREATE INDEX IDX_LOG_PAGE_ID_TIME ON logging (log_page,log_timestamp);
 
 DROP TABLE IF EXISTS page;
 CREATE TABLE page (
-  page_id int NOT NULL auto_increment,
+  page_id int NOT NULL,
   page_namespace int NOT NULL,
   page_title varbinary(255) NOT NULL,
   page_restrictions tinyblob NOT NULL,
@@ -70,7 +70,7 @@ CREATE INDEX IDX_PAGE_LEN ON page (page_len);
 
 DROP TABLE IF EXISTS page_backup;
 CREATE TABLE page_backup (
-  page_id int NOT NULL auto_increment,
+  page_id int NOT NULL,
   page_namespace int NOT NULL,
   page_title varbinary(255) NOT NULL,
   page_restrictions tinyblob NOT NULL,
@@ -105,7 +105,7 @@ CREATE INDEX IDX_PR_CASCADE ON page_restrictions (pr_cascade);
 
 DROP TABLE IF EXISTS recentchanges;
 CREATE TABLE recentchanges (
-  rc_id int NOT NULL auto_increment,
+  rc_id int NOT NULL,
   rc_timestamp varbinary(14) NOT NULL DEFAULT '',
   rc_cur_time varbinary(14) NOT NULL DEFAULT '',
   rc_user int NOT NULL DEFAULT '0',
@@ -143,7 +143,7 @@ CREATE INDEX IDX_RC_USER_TEXT ON recentchanges (rc_user_text,rc_timestamp);
 
 DROP TABLE IF EXISTS revision;
 CREATE TABLE revision (
-  rev_id int NOT NULL auto_increment,
+  rev_id int NOT NULL,
   rev_page int NOT NULL,
   rev_text_id int NOT NULL,
   rev_comment varchar(1024) NOT NULL,
@@ -164,7 +164,7 @@ CREATE INDEX IDX_USERTEXT_TIMESTAMP ON revision (rev_user_text,rev_timestamp);
 
 DROP TABLE IF EXISTS text;
 CREATE TABLE text (
-  old_id int NOT NULL auto_increment,
+  old_id int NOT NULL,
   old_text mediumblob NOT NULL,
   old_flags tinyblob NOT NULL,
   old_page int DEFAULT NULL,
@@ -173,7 +173,7 @@ CREATE TABLE text (
 
 DROP TABLE IF EXISTS useracct;
 CREATE TABLE useracct (
-  user_id int NOT NULL auto_increment,
+  user_id int NOT NULL,
   user_name varbinary(255) NOT NULL DEFAULT '',
   user_real_name varbinary(255) NOT NULL DEFAULT '',
   user_password tinyblob NOT NULL,

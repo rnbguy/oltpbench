@@ -4,7 +4,7 @@
     <!-- Connection details -->
     <dbtype>mysql</dbtype>
     <driver>com.mysql.jdbc.Driver</driver>
-    <DBUrl>jdbc:mysql://server:3306/twitter</DBUrl>
+    <DBUrl>jdbc:mysql://localhost:3306/twitter</DBUrl>
     <username>user</username>
     <password>password</password>
 
@@ -13,7 +13,7 @@
     <uploadUrl></uploadUrl>
           
     <!-- Scalefactor in Twitter scales by *500 the number of users-->
-    <scalefactor>100</scalefactor>
+    <scalefactor>0.02</scalefactor>
     
     
 	<!-- Trace files for Twitter -->
@@ -22,11 +22,11 @@
     <base_ip>10.1.</base_ip>
     
     <!-- The workload -->
-    <terminals>10</terminals>
+    <terminals>3</terminals>
     <works>
         <work>
-            <time>300</time>
-            <rate>10000</rate>
+            <time>30</time>
+            <rate>2</rate>
             <weights>0.07,0.07,7.6725,91.2656,0.9219</weights>
         </work>
     </works>

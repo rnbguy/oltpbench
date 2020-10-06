@@ -28,27 +28,51 @@ import com.oltpbenchmark.benchmarks.tatp.TATPConstants;
 
 public class GetNewDestination extends Procedure {
 
-     public final SQLStmt getNewDestination = new SQLStmt(
-         "SELECT cf.numberx " +
-         "  FROM " + TATPConstants.TABLENAME_SPECIAL_FACILITY + " sf, " +
-         "       " + TATPConstants.TABLENAME_CALL_FORWARDING + " cf " +
-         " WHERE sf.s_id = ? " +
-         "   AND sf.sf_type = ? " +
-         "   AND sf.is_active = 1 " +
-         "   AND cf.s_id = sf.s_id " +
-         "   AND cf.sf_type = sf.sf_type " +
-         "   AND cf.start_time <= ? " +
-         "   AND cf.end_time > ?"
-     );
+    //  public final SQLStmt getNewDestination = new SQLStmt(
+    //      "SELECT cf.numberx " +
+    //      "  FROM " + TATPConstants.TABLENAME_SPECIAL_FACILITY + " sf, " +
+    //      "       " + TATPConstants.TABLENAME_CALL_FORWARDING + " cf " +
+    //      " WHERE sf.s_id = ? " +
+    //      "   AND sf.sf_type = ? " +
+    //      "   AND sf.is_active = 1 " +
+    //      "   AND cf.s_id = sf.s_id " +
+    //      "   AND cf.sf_type = sf.sf_type " +
+    //      "   AND cf.start_time <= ? " +
+    //      "   AND cf.end_time > ?"
+    //  );
+
+     public final SQLStmt getNewDestination1 = new SQLStmt(
+        "SELECT s_id, sf_type " +
+        "  FROM " + TATPConstants.TABLENAME_SPECIAL_FACILITY +
+        " WHERE s_id = ? " +
+        "   AND sf_type = ? " +
+        "   AND is_active = 1 "
+    );
+
+    public final SQLStmt getNewDestination2 = new SQLStmt(
+        "SELECT cf.numberx " +
+        "  FROM " + TATPConstants.TABLENAME_CALL_FORWARDING +
+        " WHERE s_id = ? " +
+        "   AND sf_type = ? " +
+        "   AND start_time <= ? " +
+        "   AND end_time > ?"
+    );
 
      public void run(Connection conn, long s_id, byte sf_type, byte start_time, byte end_time) throws SQLException {
-    	 PreparedStatement stmt = this.getPreparedStatement(conn, getNewDestination);
-    	 stmt.setLong(1, s_id);
-    	 stmt.setByte(2, sf_type);
-    	 stmt.setByte(3, start_time);
-    	 stmt.setByte(4, end_time);
-    	 ResultSet results = stmt.executeQuery();
-    	 assert(results != null);
-    	 results.close();
+    	 PreparedStatement stmt1 = this.getPreparedStatement(conn, getNewDestination1);
+    	 PreparedStatement stmt2 = this.getPreparedStatement(conn, getNewDestination2);
+    	 stmt1.setLong(1, s_id);
+         stmt1.setByte(2, sf_type);
+         ResultSet results1 = stmt1.executeQuery();
+         while(results1.next()) {
+             Long type = results1.getLong("sf_type");
+             stmt2.setLong(1, s_id);
+             stmt2.setLong(2, type);
+             stmt2.setByte(3, start_time);
+             stmt2.setByte(4, end_time);
+             ResultSet results2 = stmt2.executeQuery();
+             assert(results2 != null);
+         }
+    	 results1.close();
      }
 }

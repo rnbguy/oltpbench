@@ -40,7 +40,7 @@ CREATE INDEX IDX_TWEETS_UID ON tweets (uid);
 
 DROP TABLE IF EXISTS added_tweets;
 CREATE TABLE added_tweets (
-  id bigint NOT NULL auto_increment,
+  id bigint NOT NULL,
   uid int NOT NULL REFERENCES user_profiles (uid),
   text char(140) NOT NULL,
   createdate datetime DEFAULT NULL,

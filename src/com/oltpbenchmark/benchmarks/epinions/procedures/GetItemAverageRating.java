@@ -27,7 +27,7 @@ import com.oltpbenchmark.api.SQLStmt;
 public class GetItemAverageRating extends Procedure {
 
     public final SQLStmt getAverageRating = new SQLStmt(
-        "SELECT avg(rating) FROM review r WHERE r.i_id=?"
+        "SELECT rating FROM review WHERE i_id=?"
     );
     
     public void run(Connection conn, long iid) throws SQLException {

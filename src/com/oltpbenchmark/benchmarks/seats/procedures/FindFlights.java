@@ -57,8 +57,7 @@ public class FindFlights extends Procedure {
             "SELECT * " +
             "  FROM " + SEATSConstants.TABLENAME_AIRPORT_DISTANCE +
             " WHERE D_AP_ID0 = ? " +
-            "   AND D_DISTANCE <= ? " +
-            " ORDER BY D_DISTANCE ASC "
+            "   AND D_DISTANCE <= ? "
     );
  
     public final SQLStmt GetAirportInfo = new SQLStmt(

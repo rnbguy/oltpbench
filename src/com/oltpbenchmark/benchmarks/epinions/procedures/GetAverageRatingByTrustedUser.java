@@ -26,19 +26,32 @@ import com.oltpbenchmark.api.SQLStmt;
 
 public class GetAverageRatingByTrustedUser extends Procedure {
 
-    public final SQLStmt getAverageRating = new SQLStmt(
-        "SELECT avg(rating) FROM review r, trust t WHERE r.u_id=t.target_u_id AND r.i_id=? AND t.source_u_id=?"
+    // public final SQLStmt getAverageRating = new SQLStmt(
+    //     "SELECT avg(rating) FROM review r, trust t WHERE r.u_id=t.target_u_id AND r.i_id=? AND t.source_u_id=?"
+    // );
+
+    public final SQLStmt getAverageRating1 = new SQLStmt(
+        "SELECT target_u_id FROM trust WHERE source_u_id=?"
+    );
+
+    public final SQLStmt getAverageRating2 = new SQLStmt(
+        "SELECT rating FROM review WHERE u_id=? AND i_id=?"
     );
     
     public void run(Connection conn, long iid, long uid) throws SQLException {
-        PreparedStatement stmt = this.getPreparedStatement(conn, getAverageRating);
-        stmt.setLong(1, iid);
-        stmt.setLong(2, uid);
-        ResultSet r= stmt.executeQuery();
-        while (r.next()) {
-            continue;
+        PreparedStatement stmt1 = this.getPreparedStatement(conn, getAverageRating1);
+        PreparedStatement stmt2 = this.getPreparedStatement(conn, getAverageRating2);
+        stmt1.setLong(1, uid);
+        ResultSet r1= stmt1.executeQuery();
+        Long total = new Long(0);
+        int count = 0;
+        while (r1.next()) {
+            int tuid = r1.getInt("target_u_id");
+            stmt2.setInt(1, tuid);
+            stmt2.setLong(2, iid);
+            ResultSet r2 = stmt2.executeQuery();
         }
-        r.close();
+        r1.close();
     }
     
 }

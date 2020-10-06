@@ -60,8 +60,8 @@ public class FindOpenSeats extends Procedure {
 //    };
     
     public final SQLStmt GetFlight = new SQLStmt(
-        "SELECT F_STATUS, F_BASE_PRICE, F_SEATS_TOTAL, F_SEATS_LEFT, " +
-        "       (F_BASE_PRICE + (F_BASE_PRICE * (1 - (F_SEATS_LEFT / F_SEATS_TOTAL)))) AS F_PRICE " +
+        "SELECT F_STATUS, F_BASE_PRICE, F_SEATS_TOTAL, F_SEATS_LEFT" +
+        "        " +
         "  FROM " + SEATSConstants.TABLENAME_FLIGHT +
         " WHERE F_ID = ?"
     );
@@ -100,7 +100,7 @@ public class FindOpenSeats extends Procedure {
         double base_price = f_results.getDouble(2);
         long seats_total = f_results.getLong(3);
         long seats_left = f_results.getLong(4);
-        double seat_price = f_results.getDouble(5);
+        double seat_price = (base_price + (base_price * (1 - (seats_left / seats_total))));
         f_results.close();
         
         // TODO: Figure out why this doesn't match the SQL

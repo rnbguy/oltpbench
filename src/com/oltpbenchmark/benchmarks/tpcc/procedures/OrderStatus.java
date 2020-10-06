@@ -42,7 +42,8 @@ public class OrderStatus extends TPCCProcedure {
             " WHERE O_W_ID = ? " + 
             "   AND O_D_ID = ? " + 
             "   AND O_C_ID = ? " +
-            " ORDER BY O_ID DESC LIMIT 1");
+            " ORDER BY O_ID DESC");
+            // " ORDER BY O_ID DESC LIMIT 1");
 
 	public SQLStmt ordStatGetOrderLinesSQL = new SQLStmt(
 	        "SELECT OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DELIVERY_D " + 
