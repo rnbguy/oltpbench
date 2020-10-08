@@ -23,6 +23,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import com.oltpbenchmark.api.Procedure.UserAbortException;
+import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.Worker;
 import com.oltpbenchmark.benchmarks.epinions.procedures.GetAverageRatingByTrustedUser;
@@ -99,14 +100,18 @@ public class EpinionsWorker extends Worker<EpinionsBenchmark> {
         GetReviewItemById proc = this.getProcedure(GetReviewItemById.class);
         assert (proc != null);
         long iid = Long.valueOf(item_ids.get(rand.nextInt(item_ids.size())));
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, iid);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void reviewsByUser() throws SQLException {
         GetReviewsByUser proc = this.getProcedure(GetReviewsByUser.class);
         assert (proc != null);
         long uid = Long.valueOf(user_ids.get(rand.nextInt(user_ids.size())));
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, uid);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void averageRatingByTrustedUser() throws SQLException {
@@ -114,14 +119,18 @@ public class EpinionsWorker extends Worker<EpinionsBenchmark> {
         assert (proc != null);
         long iid = Long.valueOf(item_ids.get(rand.nextInt(item_ids.size())));
         long uid = Long.valueOf(user_ids.get(rand.nextInt(user_ids.size())));
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, iid, uid);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void averageRatingOfItem() throws SQLException {
         GetItemAverageRating proc = this.getProcedure(GetItemAverageRating.class);
         assert (proc != null);
         long iid = Long.valueOf(item_ids.get(rand.nextInt(item_ids.size())));
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, iid);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void itemReviewsByTrustedUser() throws SQLException {
@@ -129,7 +138,9 @@ public class EpinionsWorker extends Worker<EpinionsBenchmark> {
         assert (proc != null);
         long iid = Long.valueOf(item_ids.get(rand.nextInt(item_ids.size())));
         long uid = Long.valueOf(user_ids.get(rand.nextInt(user_ids.size())));
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, iid, uid);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void updateUserName() throws SQLException {
@@ -137,7 +148,9 @@ public class EpinionsWorker extends Worker<EpinionsBenchmark> {
         assert (proc != null);
         long uid = Long.valueOf(user_ids.get(rand.nextInt(user_ids.size())));
         String name = TextGenerator.randomStr(rng(), EpinionsConstants.NAME_LENGTH); // FIXME
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, uid, name);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void updateItemTitle() throws SQLException {
@@ -145,7 +158,9 @@ public class EpinionsWorker extends Worker<EpinionsBenchmark> {
         assert (proc != null);
         long iid = Long.valueOf(item_ids.get(rand.nextInt(item_ids.size())));
         String title = TextGenerator.randomStr(rng(), EpinionsConstants.TITLE_LENGTH); // FIXME
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, iid, title);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void updateReviewRating() throws SQLException {
@@ -154,7 +169,9 @@ public class EpinionsWorker extends Worker<EpinionsBenchmark> {
         long iid = Long.valueOf(item_ids.get(rand.nextInt(item_ids.size())));
         long uid = Long.valueOf(user_ids.get(rand.nextInt(user_ids.size())));
         int rating = rand.nextInt(1000); // ???
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, iid, uid, rating);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
     public void updateTrustRating() throws SQLException {
@@ -164,7 +181,9 @@ public class EpinionsWorker extends Worker<EpinionsBenchmark> {
         long uid = Long.valueOf(user_ids.get(uix));
         long uid2 = Long.valueOf(user_ids.get(uix2));
         int trust = rand.nextInt(2);
+        proc.getPreparedStatement(conn, new SQLStmt("START TRANSACTION")).executeQuery();
         proc.run(conn, uid, uid2, trust);
+        proc.getPreparedStatement(conn, new SQLStmt("COMMIT")).executeQuery();
     }
 
 }
