@@ -117,11 +117,11 @@ public class TPCCUtil {
 	}
 
 	public static String getNonUniformRandomLastNameForRun(Random r) {
-		return getLastName(nonUniformRandom(255, C_LAST_RUN_C, 0, 999, r));
+		return getLastName(nonUniformRandom(255, C_LAST_RUN_C, 0, (TPCCConfig.configCustPerDist > 3000 ? 1000 : (TPCCConfig.configCustPerDist / 3)) - 1, r));
 	}
 
 	public static String getNonUniformRandomLastNameForLoad(Random r) {
-		return getLastName(nonUniformRandom(255, C_LAST_LOAD_C, 0, 999, r));
+		return getLastName(nonUniformRandom(255, C_LAST_LOAD_C, 0, (TPCCConfig.configCustPerDist > 3000 ? 1000 : (TPCCConfig.configCustPerDist / 3)) - 1, r));
 	}
 
 	public static int randomNumber(int min, int max, Random r) {

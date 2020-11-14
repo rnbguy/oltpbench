@@ -68,7 +68,7 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
     }
     
     private int numWarehouses = 0;
-    private static final int FIRST_UNPROCESSED_O_ID = 2101;
+    private static final int FIRST_UNPROCESSED_O_ID = 3;
     
     @Override
     public List<LoaderThread> createLoaderThreads() throws SQLException {
@@ -197,9 +197,11 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
                 itemPrepStmt.addBatch();
                 batchSize++;
 
+
+				itemPrepStmt.executeBatch();
+				itemPrepStmt.clearBatch();
+
                 if (batchSize == TPCCConfig.configCommitCount) {
-                    itemPrepStmt.executeBatch();
-                    itemPrepStmt.clearBatch();
                     transCommit(conn);
                     batchSize = 0;
                 }
@@ -240,7 +242,7 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
             Warehouse warehouse = new Warehouse();
 
             warehouse.w_id = w_id;
-            warehouse.w_ytd = 300000;
+            warehouse.w_ytd = TPCCConfig.w_ytd; // h_amount * CUSTOMER_DISTRICT * DISTRICT_WAREHOUSE
 
             // random within [0.0000 .. 0.2000]
             warehouse.w_tax = (double) ((TPCCUtil.randomNumber(0, 2000, benchmark.rng())) / 10000.0);
@@ -331,9 +333,9 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
 				stckPrepStmt.setString(idx++, TPCCUtil.randomStr(24));
 				stckPrepStmt.setString(idx++, TPCCUtil.randomStr(24));
 				stckPrepStmt.addBatch();
+				stckPrepStmt.executeBatch();
+				stckPrepStmt.clearBatch();
 				if ((k % TPCCConfig.configCommitCount) == 0) {
-					stckPrepStmt.executeBatch();
-					stckPrepStmt.clearBatch();
 					transCommit(conn);
 				}
 			} // end for [i]
@@ -366,7 +368,7 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
 			for (int d = 1; d <= distWhseKount; d++) {
 				district.d_id = d;
 				district.d_w_id = w_id;
-				district.d_ytd = 30000;
+				district.d_ytd = TPCCConfig.d_ytd;
 
 				// random within [0.0000 .. 0.2000]
 				district.d_tax = (float) ((TPCCUtil.randomNumber(0, 2000, benchmark.rng())) / 10000.0);
@@ -435,16 +437,18 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
 					} else {
 						customer.c_credit = "GC"; // 90% Good Credit
 					}
-					if (c <= 1000) {
+					if (c <= (TPCCConfig.configCustPerDist > 3000 ? 1000 : (TPCCConfig.configCustPerDist / 3))) {
 						customer.c_last = TPCCUtil.getLastName(c - 1);
+					} else if (TPCCConfig.configCustPerDist == 1) {
+						customer.c_last = "XYZ";
 					} else {
 						customer.c_last = TPCCUtil.getNonUniformRandomLastNameForLoad(benchmark.rng());
 					}
 					customer.c_first = TPCCUtil.randomStr(TPCCUtil.randomNumber(8, 16, benchmark.rng()));
 					customer.c_credit_lim = 50000;
 
-					customer.c_balance = -10;
-					customer.c_ytd_payment = 10;
+					customer.c_balance = -TPCCConfig.h_amount;
+					customer.c_ytd_payment = TPCCConfig.h_amount;
 					customer.c_payment_cnt = 1;
 					customer.c_delivery_cnt = 0;
 
@@ -466,7 +470,7 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
 					history.h_d_id = d;
 					history.h_w_id = w_id;
 					history.h_date = sysdate;
-					history.h_amount = 10;
+					history.h_amount = TPCCConfig.h_amount;
 					history.h_data = TPCCUtil.randomStr(TPCCUtil
 							.randomNumber(10, 24, benchmark.rng()));
 
@@ -506,11 +510,12 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
 					histPrepStmt.setString(idx++, history.h_data);
 					histPrepStmt.addBatch();
 
+					custPrepStmt.executeBatch();
+					histPrepStmt.executeBatch();
+					custPrepStmt.clearBatch();
+					custPrepStmt.clearBatch();
+
 					if ((k % TPCCConfig.configCommitCount) == 0) {
-						custPrepStmt.executeBatch();
-						histPrepStmt.executeBatch();
-						custPrepStmt.clearBatch();
-						custPrepStmt.clearBatch();
 						transCommit(conn);
 					}
 				} // end for [c]
@@ -652,17 +657,18 @@ public class TPCCLoader extends Loader<TPCCBenchmark> {
 			            orlnPrepStmt.setString(idx++, order_line.ol_dist_info);
 			            orlnPrepStmt.addBatch();
 
+						ordrPrepStmt.executeBatch();
+						if (newOrderBatch > 0) {
+							nworPrepStmt.executeBatch();
+							newOrderBatch = 0;
+						}
+						orlnPrepStmt.executeBatch();
+
+						ordrPrepStmt.clearBatch();
+						nworPrepStmt.clearBatch();
+						orlnPrepStmt.clearBatch();
+
 						if ((k % TPCCConfig.configCommitCount) == 0) {
-							ordrPrepStmt.executeBatch();
-							if (newOrderBatch > 0) {
-							    nworPrepStmt.executeBatch();
-							    newOrderBatch = 0;
-							}
-							orlnPrepStmt.executeBatch();
-							
-							ordrPrepStmt.clearBatch();
-							nworPrepStmt.clearBatch();
-							orlnPrepStmt.clearBatch();
 							transCommit(conn);
 						}
 

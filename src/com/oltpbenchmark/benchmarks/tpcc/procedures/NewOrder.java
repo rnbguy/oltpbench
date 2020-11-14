@@ -58,7 +58,7 @@ public class NewOrder extends TPCCProcedure {
             " VALUES ( ?, ?, ?)");
 
 	public final SQLStmt  stmtUpdateDistSQL = new SQLStmt(
-	        "UPDATE " + TPCCConstants.TABLENAME_DISTRICT + 
+	        "UPDATE " + TPCCConstants.TABLENAME_DISTRICT +
 	        "   SET D_NEXT_O_ID = D_NEXT_O_ID + 1 " +
             " WHERE D_W_ID = ? " +
 	        "   AND D_ID = ?");
@@ -405,6 +405,8 @@ public class NewOrder extends TPCCProcedure {
               if (stmtUpdateStock != null)
                 stmtUpdateStock.clearBatch();
         }
+
+		conn.commit();
 
 	}
 

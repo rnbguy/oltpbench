@@ -22,8 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
+import com.oltpbenchmark.benchmarks.tpcc.TPCCConfig;
 import org.apache.log4j.Logger;
 
 import com.oltpbenchmark.api.SQLStmt;
@@ -41,8 +44,8 @@ public class OrderStatus extends TPCCProcedure {
             "  FROM " + TPCCConstants.TABLENAME_OPENORDER + 
             " WHERE O_W_ID = ? " + 
             "   AND O_D_ID = ? " + 
-            "   AND O_C_ID = ? " +
-            " ORDER BY O_ID DESC");
+            "   AND O_C_ID = ? ");
+            // " ORDER BY O_ID DESC");
             // " ORDER BY O_ID DESC LIMIT 1");
 
 	public SQLStmt ordStatGetOrderLinesSQL = new SQLStmt(
@@ -68,8 +71,8 @@ public class OrderStatus extends TPCCProcedure {
             "  FROM " + TPCCConstants.TABLENAME_CUSTOMER + 
             " WHERE C_W_ID = ? " +
             "   AND C_D_ID = ? " +
-            "   AND C_LAST = ? " + 
-            " ORDER BY C_FIRST");
+            "   AND C_LAST = ? ");
+            // " ORDER BY C_FIRST");
 
 	private PreparedStatement ordStatGetNewestOrd = null;
 	private PreparedStatement ordStatGetOrderLines = null;
@@ -93,7 +96,11 @@ public class OrderStatus extends TPCCProcedure {
         int c_id = -1;
         if (y <= 60) {
             c_by_name = true;
-            c_last = TPCCUtil.getNonUniformRandomLastNameForRun(gen);
+            if (TPCCConfig.configCustPerDist == 1) {
+                c_last = "XYZ";
+            } else {
+                c_last = TPCCUtil.getNonUniformRandomLastNameForRun(gen);
+            }
         } else {
             c_by_name = false;
             c_id = TPCCUtil.getCustomerID(gen);
@@ -134,6 +141,15 @@ public class OrderStatus extends TPCCProcedure {
         o_id = rs.getInt("O_ID");
         o_carrier_id = rs.getInt("O_CARRIER_ID");
         o_entry_d = rs.getTimestamp("O_ENTRY_D");
+
+        while (rs.next()) {
+            int o_id_next = rs.getInt("O_ID");
+            if (o_id < o_id_next) {
+                o_id = o_id_next;
+                o_carrier_id = rs.getInt("O_CARRIER_ID");
+                o_entry_d = rs.getTimestamp("O_ENTRY_D");
+            }
+        }
         rs.close();
 
         // retrieve the order lines for the most recent order
@@ -265,9 +281,16 @@ public class OrderStatus extends TPCCProcedure {
             Customer c = TPCCUtil.newCustomerFromResults(rs);
             c.c_id = rs.getInt("C_ID");
             c.c_last = c_last;
+            c.c_first = rs.getString("C_FIRST");
             customers.add(c);
         }
         rs.close();
+
+        Collections.sort(customers, new Comparator<Customer>(){
+            public int compare(Customer c1, Customer c2) {
+                return c1.c_first.compareTo(c2.c_first);
+            }
+        });
 
         if (customers.size() == 0) {
             String msg = String.format("Failed to get CUSTOMER [C_W_ID=%d, C_D_ID=%d, C_LAST=%s]",

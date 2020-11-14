@@ -94,7 +94,7 @@ public class WriteCheck extends Procedure {
         
         PreparedStatement updateStmt = null;
         if (total < amount) {
-            updateStmt = this.getPreparedStatement(conn, UpdateCheckingBalance, amount - 1, custId);
+            updateStmt = this.getPreparedStatement(conn, UpdateCheckingBalance, amount + 1, custId);
         } else {
             updateStmt = this.getPreparedStatement(conn, UpdateCheckingBalance, amount, custId);
         }

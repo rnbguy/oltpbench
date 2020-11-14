@@ -128,7 +128,7 @@ public class StockLevel extends TPCCProcedure {
          getOrderLineId.setInt(1, w_id);
          getOrderLineId.setInt(2, d_id);
          getOrderLineId.setInt(3, o_id);
-         getOrderLineId.setInt(4, (o_id -20));
+         getOrderLineId.setInt(4, (o_id > 20 ? o_id -20 : o_id));
          if (trace) LOG.trace(String.format("stockGetCountStock BEGIN [W_ID=%d, D_ID=%d, O_ID=%d]", w_id, d_id, o_id));
          ResultSet ol_rs = getOrderLineId.executeQuery();
          // ol_rs.next();

@@ -5,13 +5,13 @@
     <dbtype>mysql</dbtype>
     <driver>com.mysql.jdbc.Driver</driver>
     <DBUrl>jdbc:mysql://localhost:3306/smallbank</DBUrl>
-    <username>user</username>
-    <password>pass</password>    
+    <username>root</username>
+    <password></password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
     <uploadCode></uploadCode>
     <uploadUrl></uploadUrl>
     
-    <scalefactor>0.01</scalefactor>
+    <scalefactor>1</scalefactor>
     
     <!-- The workload -->
     <terminals>1</terminals>
@@ -19,7 +19,7 @@
         <work>
           <time>1</time>
           <rate>1</rate>
-          <weights>15,15,15,25,15,15</weights>
+          <weights>30,30,0,40,0,0</weights>
         </work>
     </works>
         

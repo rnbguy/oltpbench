@@ -77,6 +77,12 @@ public class Amalgamate extends Procedure {
         "   SET bal = 0.0 " +
         " WHERE custid = ?"
     );
+
+    public final SQLStmt ZeroSavingsBalance = new SQLStmt(
+        "UPDATE " + SmallBankConstants.TABLENAME_SAVINGS +
+        "   SET bal = 0.0 " +
+        " WHERE custid = ?"
+    );
     
     public void run(Connection conn, long custId0, long custId1) throws SQLException {
         // Get Account Information
@@ -104,7 +110,7 @@ public class Amalgamate extends Procedure {
             throw new UserAbortException(msg);
         }
         
-        PreparedStatement balStmt1 = this.getPreparedStatement(conn, GetCheckingBalance, custId1);
+        PreparedStatement balStmt1 = this.getPreparedStatement(conn, GetCheckingBalance, custId0);
         ResultSet balRes1 = balStmt1.executeQuery();
         if (balRes1.next() == false) {
             String msg = String.format("No %s for customer #%d",
@@ -120,9 +126,13 @@ public class Amalgamate extends Procedure {
         PreparedStatement updateStmt0 = this.getPreparedStatement(conn, ZeroCheckingBalance, custId0);
         int status = updateStmt0.executeUpdate();
         assert(status == 1);
-        
-        PreparedStatement updateStmt1 = this.getPreparedStatement(conn, UpdateSavingsBalance, total, custId1);
+
+        PreparedStatement updateStmt1 = this.getPreparedStatement(conn, ZeroSavingsBalance, custId0);
         status = updateStmt1.executeUpdate();
+        assert(status == 1);
+        
+        PreparedStatement updateStmt2 = this.getPreparedStatement(conn, UpdateCheckingBalance, total, custId1);
+        status = updateStmt2.executeUpdate();
         assert(status == 1);
                 
 //        if (balance < 0) {

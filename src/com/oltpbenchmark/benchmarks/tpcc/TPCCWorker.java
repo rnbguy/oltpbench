@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 
 import com.oltpbenchmark.api.Procedure.UserAbortException;
 import com.oltpbenchmark.api.TransactionType;
+import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.api.Worker;
 import com.oltpbenchmark.benchmarks.tpcc.procedures.TPCCProcedure;
 import com.oltpbenchmark.types.TransactionStatus;
@@ -70,7 +71,7 @@ public class TPCCWorker extends Worker<TPCCBenchmark> {
 	@Override
     protected TransactionStatus executeWork(TransactionType nextTransaction) throws UserAbortException, SQLException {
         try {
-            TPCCProcedure proc = (TPCCProcedure) this.getProcedure(nextTransaction.getProcedureClass());
+			TPCCProcedure proc = (TPCCProcedure) this.getProcedure(nextTransaction.getProcedureClass());
             proc.run(conn, gen, terminalWarehouseID, numWarehouses,
                     terminalDistrictLowerID, terminalDistrictUpperID, this);
         } catch (ClassCastException ex){

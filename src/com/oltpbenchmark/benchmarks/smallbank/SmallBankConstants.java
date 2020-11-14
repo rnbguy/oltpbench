@@ -35,14 +35,14 @@ public abstract class SmallBankConstants {
     public static final String TABLENAME_SAVINGS    = "SAVINGS";
     public static final String TABLENAME_CHECKING   = "CHECKING";
     
-    public static final int BATCH_SIZE              = 5000;
+    public static final int BATCH_SIZE              = 1;
     
     // ----------------------------------------------------------------
     // ACCOUNT INFORMATION
     // ----------------------------------------------------------------
     
     // Default number of customers in bank
-    public static final int NUM_ACCOUNTS            = 1000000;
+    public static final int NUM_ACCOUNTS            = 2;
     
     public static final boolean HOTSPOT_USE_FIXED_SIZE  = false;
     public static final double HOTSPOT_PERCENTAGE       = 25; // [0% - 100%]

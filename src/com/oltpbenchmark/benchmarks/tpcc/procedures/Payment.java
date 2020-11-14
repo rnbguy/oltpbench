@@ -21,6 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -105,8 +107,8 @@ public class Payment extends TPCCProcedure {
             "  FROM " + TPCCConstants.TABLENAME_CUSTOMER + 
             " WHERE C_W_ID = ? " +
             "   AND C_D_ID = ? " +
-            "   AND C_LAST = ? " +
-            " ORDER BY C_FIRST");
+            "   AND C_LAST = ? ");
+//            " ORDER BY C_FIRST");
 
     // Payment Txn
     private PreparedStatement payUpdateWhse = null;
@@ -161,7 +163,11 @@ public class Payment extends TPCCProcedure {
         if (y <= 60) {
             // 60% lookups by last name
             customerByName = true;
-            customerLastName = TPCCUtil.getNonUniformRandomLastNameForRun(gen);
+            if (TPCCConfig.configCustPerDist == 1) {
+                customerLastName = "XYZ";
+            } else {
+                customerLastName = TPCCUtil.getNonUniformRandomLastNameForRun(gen);
+            }
         } else {
             // 40% lookups by customer ID
             customerByName = false;
@@ -407,6 +413,12 @@ public class Payment extends TPCCProcedure {
             customers.add(c);
         }
         rs.close();
+
+        Collections.sort(customers, new Comparator<Customer>(){
+            public int compare(Customer c1, Customer c2) {
+                return c1.c_first.compareTo(c2.c_first);
+            }
+        });
 
         if (customers.size() == 0) {
             throw new RuntimeException("C_LAST=" + customerLastName + " C_D_ID=" + c_d_id + " C_W_ID=" + c_w_id + " not found!");

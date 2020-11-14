@@ -38,9 +38,9 @@ public class Delivery extends TPCCProcedure {
 	public SQLStmt delivGetOrderIdSQL = new SQLStmt(
 	        "SELECT NO_O_ID FROM " + TPCCConstants.TABLENAME_NEWORDER + 
 	        " WHERE NO_D_ID = ? " +
-	        "   AND NO_W_ID = ? " +
-	        " ORDER BY NO_O_ID ASC ");
-	        // " LIMIT 1");
+	        "   AND NO_W_ID = ? ");
+//	         " ORDER BY NO_O_ID ASC " +
+//	         " LIMIT 1");
 	
 	public SQLStmt delivDeleteNewOrderSQL = new SQLStmt(
 	        "DELETE FROM " + TPCCConstants.TABLENAME_NEWORDER +
@@ -113,7 +113,6 @@ public class Delivery extends TPCCProcedure {
 		delivUpdateCustBalDelivCnt = this.getPreparedStatement(conn, delivUpdateCustBalDelivCntSQL);
 
 		int d_id, c_id;
-        float ol_total = 0;
         int[] orderIDs;
 
         orderIDs = new int[10];
@@ -131,6 +130,14 @@ public class Delivery extends TPCCProcedure {
             }
 
             int no_o_id = rs.getInt("NO_O_ID");
+
+            while (rs.next()) {
+                int no_o_id_next = rs.getInt("NO_O_ID");
+                if (no_o_id_next < no_o_id) {
+                    no_o_id = no_o_id_next;
+                }
+            }
+
             orderIDs[d_id - 1] = no_o_id;
             rs.close();
             rs = null;
@@ -184,6 +191,7 @@ public class Delivery extends TPCCProcedure {
                 throw new RuntimeException(msg);
             }
 
+
             delivUpdateDeliveryDate.setTimestamp(1, timestamp);
             delivUpdateDeliveryDate.setInt(2, no_o_id);
             delivUpdateDeliveryDate.setInt(3, d_id);
@@ -199,7 +207,6 @@ public class Delivery extends TPCCProcedure {
                 throw new RuntimeException(msg);
             }
 
-
             delivSumOrderAmount.setInt(1, no_o_id);
             delivSumOrderAmount.setInt(2, d_id);
             delivSumOrderAmount.setInt(3, w_id);
@@ -207,15 +214,17 @@ public class Delivery extends TPCCProcedure {
             rs = delivSumOrderAmount.executeQuery();
             if (trace) LOG.trace("delivSumOrderAmount END");
 
-            while (rs.next()) {
-                ol_total += rs.getFloat(1);
-            }
-
-            if (ol_total == 0) {
+            if (!rs.next()) {
                 String msg = String.format("Failed to retrieve ORDER_LINE records [W_ID=%d, D_ID=%d, O_ID=%d]",
                                            w_id, d_id, no_o_id);
                 if (trace) LOG.warn(msg);
                 throw new RuntimeException(msg);
+            }
+
+            double ol_total = rs.getFloat(1);
+
+            while (rs.next()) {
+                ol_total += rs.getFloat(1);
             }
             // ol_total = rs.getFloat("OL_TOTAL");
             rs.close();

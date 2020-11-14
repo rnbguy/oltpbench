@@ -260,7 +260,7 @@ public abstract class BenchmarkModule {
         try {
             URL ddl = this.getDatabaseDDL(dbType);
             assert(ddl != null) : "Failed to get DDL for " + this;
-            ScriptRunner runner = new ScriptRunner(conn, true, true);
+            ScriptRunner runner = new ScriptRunner(conn, false, true);
             if (LOG.isDebugEnabled()) LOG.debug("Executing script '" + ddl + "'");
             runner.runScript(ddl);
         } catch (Exception ex) {
